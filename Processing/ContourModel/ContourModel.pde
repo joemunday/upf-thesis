@@ -1,8 +1,11 @@
 /*
 Joe Munday
-Master Thesis
-Universitat Pompeu Fabra
+Master Thesis: Interfaces for Improvising with a Jazz Melody Generation System
 Contour Model Interface
+
+Master in Sound and Music Computing
+Universitat Pompeu Fabra 2016-2017
+
 An interface maximising the affordances of touch screens, for use with a melody generator.
 */
 

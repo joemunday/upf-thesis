@@ -1,3 +1,12 @@
+"""
+Joe Munday
+Master Thesis: Interfaces for Improvising with a Jazz Melody Generation System
+Melody Generation Module
+
+Master in Sound and Music Computing
+Universitat Pompeu Fabra 2016-2017
+"""
+
 import csv
 import os
 import random
@@ -24,7 +33,7 @@ def chordSimplify(complexChord):
     else:
         return noteName+'maj'
 
-rootdir = '/Users/joemunday/Documents/UPF Masters 1617/Master Thesis/CSVs/Transposed/Jazz Standards'
+rootdir = '' #path to source csv files
 
 majorFiles = {}
 minorFiles = {}
@@ -705,6 +714,7 @@ def fiveSuggestions(noteChordSequenceCurrent, currentChord):
 print 'Models Ready'
 
 
+### OSC SERVER ###
 
 #!/usr/bin/env python3
 from OSC import OSCServer
@@ -713,35 +723,19 @@ import sys
 from time import sleep
 server = OSCServer( ("localhost", 57125) )
 processing = OSC.OSCClient()
-processing.connect(('127.0.0.1', 12000))   # connect to SuperCollider
+processing.connect(('127.0.0.1', 12000))   # connect to Processing
 
 
 currentChain = [[62,'G9'],[60,'G9'],[62,'G9'],[60,'G9']]
 currentChord = 'Cmaj9'
 run = True
 
-
-# this method of reporting timeouts only works by convention
-# that before calling handle_request() field .timed_out is 
-# set to False
 def handle_timeout(self):
     self.timed_out = True
-
-# funny python's way to add a method to an instance of a class
 import types
 server.handle_timeout = types.MethodType(handle_timeout, server)
 
-def user_callback(path, tags, args, source):
-    # which user will be determined by path:
-    # we just throw away all slashes and join together what's left
-    user = ''.join(path.split("/"))
-    # tags will contain 'fff'
-    # args is a OSCMessage with data
-    # source is where the message came from (in case you need to reply)
-    print ("Now do something with", user,args[2],args[0],1-args[1]) 
-
 def quit_callback(path, tags, args, source):
-    # don't do this at home (or it'll quit blender)
     global run
     run = False
     server.close()
@@ -758,18 +752,7 @@ def newNote(path, tags, args, source):
     oscmsg.append(fiveNewSuggestions)
     oscmsg.append(fiveNewModels)
     processing.send(oscmsg)
-    # newSuggestion = noteSuggestion(currentChain,args[0])
-    
-    # oscmsg = OSC.OSCMessage()
-    # oscmsg.setAddress("/newNoteResponse")
-    # oscmsg.append(newSuggestion)
-    # supercollider.send(oscmsg)
-    # print newSuggestion
 
-    # print args[0]
-    # print fiveSuggestions(currentChain,args[0])
-    # currentChain = currentChain[1:]+currentChain[:1]
-    # currentChain[3] = [newSuggestion,args[0]]
 def sendnotes():
     oscmsg = OSC.OSCMessage()
     oscmsg.setAddress("/newSuggestions")
@@ -779,36 +762,12 @@ def sendnotes():
 def newChord(path, tags, args, source):
     global currentChord
     currentChord = args[0]
-    # sendNotes()
     global currentChain
     oscmsg = OSC.OSCMessage()
     oscmsg.setAddress("/newSuggestions")
-    # print currentChain
     oscmsg.append(fiveSuggestions(currentChain,currentChord))
     processing.send(oscmsg)
 
-
-
-
 server.addMsgHandler( "/newNote", newNote )
 server.addMsgHandler( "/newChord", newChord )
-
 server.addMsgHandler( "/quit", quit_callback )
-
-# user script that's called by the game engine every frame
-def each_frame():
-    # clear timed_out flag
-    server.timed_out = False
-    # handle all pending requests then return
-    while not server.timed_out:
-        server.handle_request()
-
-# simulate a "game engine"
-while run:
-    # do the game stuff:
-    sleep(1)
-    # call user script
-    each_frame()
-
-# server.close()
-

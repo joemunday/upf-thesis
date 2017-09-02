@@ -1,8 +1,11 @@
 /*
 Joe Munday
-Master Thesis
-Universitat Pompeu Fabra
+Master Thesis: Interfaces for Improvising with a Jazz Melody Generation System
 Intervallic Keyboard Interface
+
+Master in Sound and Music Computing
+Universitat Pompeu Fabra 2016-2017
+
 An interface based on extending the keyboard interface metaphor for touch screens, for use with a melody generator.
 */
 
